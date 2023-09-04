@@ -1,15 +1,15 @@
 <template>
   <div class="equipment-calculator">
-    <div v-for="(section, index) in equipmentSections" :key="section.type">
+    <div v-for="(section, index) in equipmentSections" :key="index">
       <div class="question">
         <h2>{{ section.name }}</h2>
         <div>
           <div v-for="item in section.items" :key="item.id">
             <button
-              class="equipment-button"
-              @click="selectEquipment(section.type, item.id)"
-              :class="{ 'selected': selectedEquipment[section.type] === item.id }"
-            >
+            class="equipment-button"
+  @click="selectEquipment(index, item.name)"
+  :class="{ 'selected': selectedEquipment[index] === item.name }"
+>
               <div class="equipment-option">
                 <div class="equipment-image">
                   <img :src="item.imgHref" :alt="item.name" />
@@ -62,10 +62,10 @@ export default {
     });
   },
   methods: {
-    selectEquipment(sectionType, itemId) {
-      // Przypisz nową właściwość do obiektu selectedEquipment
-      this.selectedEquipment[sectionType] = itemId;
-    },
+    selectEquipment(sectionIndex, itemName) {
+  this.selectedEquipment[sectionIndex] = itemName;
+},
+
     calculateCost() {
       // Inicjalizuj zmienną na całkowity koszt
       let totalCost = 0;
@@ -111,6 +111,9 @@ export default {
 
 
 <style scoped>
+.equipment-button.selected {
+  background-color: #00FF00; /* Zielony kolor dla zaznaczonych opcji */
+}
 .equipment-button {
   width: 100%;
   padding: 0;
@@ -144,6 +147,7 @@ export default {
   overflow: hidden;
   margin-right: 10px;
 }
+
 
 .equipment-image img {
   width: 100%;
