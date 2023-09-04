@@ -1,7 +1,6 @@
 <template>
   <div class="equipment-calculator">
     <div v-for="(section, index) in equipmentSections" :key="index">
-    <div v-for="(section, index) in equipmentSections" :key="index">
       <div class="question">
         <h2>{{ section.name }}</h2>
         <div>
