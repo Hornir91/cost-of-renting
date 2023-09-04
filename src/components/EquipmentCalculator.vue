@@ -47,13 +47,12 @@ export default {
       equipmentSections: [],
       selectedEquipment: {},
       showSummary: false,
-      dataJson: null // Nowa właściwość do przechowywania danych z data.json
+      dataJson: null
     };
   },
   mounted() {
     axios.get(process.env.BASE_URL + 'data.json')
     .then(response => {
-      // Zapisz dane z data.json w dataJson
       this.dataJson = response.data;
       this.equipmentSections = this.dataJson.filter(section => section.type === 'sectionDefinition')[0].items;
     })
@@ -67,18 +66,14 @@ export default {
 },
 
     calculateCost() {
-      // Inicjalizuj zmienną na całkowity koszt
       let totalCost = 0;
       
-      // Iteruj przez wybrane elementy w selectedEquipment
       for (const sectionType in this.selectedEquipment) {
         const itemId = this.selectedEquipment[sectionType];
         
-        // Znajdź wybrany element w danych
         const section = this.dataJson.find(section => section.type === 'sectionDefinition');
         const item = section.items.find(item => item.id === itemId);
         
-        // Jeśli element został znaleziony, dodaj jego koszt do całkowitego kosztu
         if (item) {
           totalCost += this.calculateItemCost(item);
         }
@@ -87,12 +82,9 @@ export default {
       return totalCost;
     },
     calculateItemCost(item) {
-  // Inicjalizuj koszt elementu
   let itemCost = 0;
 
-  // Sprawdź, czy item.operationsIfEnabled jest tablicą, zanim będziesz próbować go przeglądać
   if (Array.isArray(item.operationsIfEnabled)) {
-    // Przeglądaj operacje elementu i oblicz koszt
     for (const operation of item.operationsIfEnabled) {
       if (operation.type === 'add') {
         itemCost += operation.number;
@@ -112,7 +104,7 @@ export default {
 
 <style scoped>
 .equipment-button.selected {
-  background-color: #00FF00; /* Zielony kolor dla zaznaczonych opcji */
+  background-color: #00FF00;
 }
 .equipment-button {
   width: 100%;
