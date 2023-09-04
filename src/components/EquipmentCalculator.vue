@@ -15,7 +15,9 @@
                   <img :src="item.imgHref" :alt="item.name" />
                 </div>
                 <div class="equipment-info">
-                  <div class="equipment-name">{{ item.name }}</div>
+                  <div class="equipment-name">
+                    <strong>{{ item.name }}</strong>
+                  </div>
                   <div class="equipment-description">{{ item.description }}</div>
                 </div>
               </div>
@@ -44,13 +46,16 @@ export default {
     return {
       equipmentSections: [],
       selectedEquipment: {},
-      showSummary: false
+      showSummary: false,
+      dataJson: null // Nowa właściwość do przechowywania danych z data.json
     };
   },
   mounted() {
     axios.get(process.env.BASE_URL + 'data.json')
     .then(response => {
-      this.equipmentSections = response.data.filter(section => section.type === 'sectionDefinition')[0].items;
+      // Zapisz dane z data.json w dataJson
+      this.dataJson = response.data;
+      this.equipmentSections = this.dataJson.filter(section => section.type === 'sectionDefinition')[0].items;
     })
     .catch(error => {
       console.error('Error loading data:', error);
@@ -58,27 +63,62 @@ export default {
   },
   methods: {
     selectEquipment(sectionType, itemId) {
-      this.$set(this.selectedEquipment, sectionType, itemId);
+      // Przypisz nową właściwość do obiektu selectedEquipment
+      this.selectedEquipment[sectionType] = itemId;
     },
     calculateCost() {
-      // Implementuj logikę obliczania kosztu
+      // Inicjalizuj zmienną na całkowity koszt
+      let totalCost = 0;
+      
+      // Iteruj przez wybrane elementy w selectedEquipment
+      for (const sectionType in this.selectedEquipment) {
+        const itemId = this.selectedEquipment[sectionType];
+        
+        // Znajdź wybrany element w danych
+        const section = this.dataJson.find(section => section.type === 'sectionDefinition');
+        const item = section.items.find(item => item.id === itemId);
+        
+        // Jeśli element został znaleziony, dodaj jego koszt do całkowitego kosztu
+        if (item) {
+          totalCost += this.calculateItemCost(item);
+        }
+      }
+      
+      return totalCost;
     },
-    findSelectedEquipment() {
-      // Implementuj logikę znajdowania wybranego sprzętu
+    calculateItemCost(item) {
+  // Inicjalizuj koszt elementu
+  let itemCost = 0;
+
+  // Sprawdź, czy item.operationsIfEnabled jest tablicą, zanim będziesz próbować go przeglądać
+  if (Array.isArray(item.operationsIfEnabled)) {
+    // Przeglądaj operacje elementu i oblicz koszt
+    for (const operation of item.operationsIfEnabled) {
+      if (operation.type === 'add') {
+        itemCost += operation.number;
+      } else if (operation.type === 'multiply') {
+        itemCost *= operation.number;
+      }
     }
+  }
+
+  return itemCost;
+}
+
   }
 };
 </script>
 
+
 <style scoped>
 .equipment-button {
+  width: 100%;
   padding: 0;
   margin: 5px;
-  cursor: pointer;
   background-color: #ffffff;
-  border-radius: 15px;
   border: none;
-  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
   transition: background-color 0.5s;
 }
 
@@ -88,14 +128,12 @@ export default {
 
 .equipment-button.selected .equipment-option {
  /* to do */
-
 }
 
 .equipment-option {
   display: flex;
   align-items: center;
-
-  padding: 5px 10px;
+  padding: 15px 20px;
   transition: background-color 0.3s;
 }
 
@@ -115,6 +153,7 @@ export default {
 
 .equipment-name {
   flex: 1;
+  text-align: left;
 }
 
 .question {
@@ -122,7 +161,12 @@ export default {
   padding: 10px;
   margin-bottom: 10px;
   color: white;
-
+  padding: 50px;
+}
+@media (min-width: 768px) {
+  .question {
+    /* margin-bottom: 320px; */
+  }
 }
 
 .question-divider {
