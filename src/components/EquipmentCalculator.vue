@@ -1,14 +1,14 @@
 <template>
   <div class="equipment-calculator">
-    <div v-for="(section, index) in equipmentSections" :key="section.type">
+    <div v-for="(section, index) in equipmentSections" :key="index">
       <div class="question">
         <h2>{{ section.name }}</h2>
         <div>
-          <div v-for="item in section.items" :key="item.id">
+          <div v-for="item  in section.items" :key="item.name">
             <button
               class="equipment-button"
-              @click="selectEquipment(section.type, item.id)"
-              :class="{ 'selected': selectedEquipment[section.type] === item.id }"
+              @click="selectEquipment(index, item.name, section.selectionType)"
+              :class="{ 'selected': selectedEquipment[index].includes(item.name)}"
             >
               <div class="equipment-option">
                 <div class="equipment-image">
@@ -43,7 +43,13 @@ export default {
   data() {
     return {
       equipmentSections: [],
-      selectedEquipment: {},
+      selectedEquipment: {
+        0: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+      },
       showSummary: false
     };
   },
@@ -57,8 +63,20 @@ export default {
     });
   },
   methods: {
-    selectEquipment(sectionType, itemId) {
-      this.$set(this.selectedEquipment, sectionType, itemId);
+    selectEquipment(sectionIndex, itemName, selectionType) {
+      if (selectionType === 'single') {
+        this.selectedEquipment[sectionIndex] = []
+        this.selectedEquipment[sectionIndex].push(itemName);
+      }
+
+      if (selectionType === 'multi') {
+        if (this.selectedEquipment[sectionIndex].includes(itemName)) {
+          const index = this.selectedEquipment[sectionIndex].indexOf(itemName)
+          this.selectedEquipment[sectionIndex].splice(index, 1)
+        } else {
+          this.selectedEquipment[sectionIndex].push(itemName)
+        }
+      }
     },
     calculateCost() {
       // Implementuj logikę obliczania kosztu
@@ -88,7 +106,7 @@ export default {
 
 .equipment-button.selected .equipment-option {
  /* to do */
-
+  background: yellow;
 }
 
 .equipment-option {
