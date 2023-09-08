@@ -170,12 +170,11 @@ export default {
         rollerMultiplier += 0.9
       }
       const speedSectionDefinition = this.dataJson[1].items[2].items
-      speedMultiplier += 0
-      console.log(speedSectionDefinition.filter(el => {
+      speedMultiplier += speedSectionDefinition.filter(el => {
         if (el.name === this.selectedAnswers[2][0]) {
           return el
         }
-      })[0].operationsIfEnabled[0].number)
+      })[0].operationsIfEnabled[0].number
 
       return excavatorCraneMultiplier + rollerMultiplier + speedMultiplier;
     },
